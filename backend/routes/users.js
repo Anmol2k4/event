@@ -200,6 +200,42 @@ router.patch('/promote-admin/:userId', authenticateToken, requireAdmin, async (r
   }
 });
 
+// Delete user (admin only)
+router.delete('/:userId', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Prevent admins from deleting themselves
+    if (userId === req.user.id) {
+      return res.status(400).json({ error: 'You cannot delete your own account' });
+    }
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Store user info for response before deletion
+    const deletedUserInfo = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+    
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+    
+    res.json({
+      message: `User ${deletedUserInfo.name} has been deleted successfully`,
+      deletedUser: deletedUserInfo
+    });
+  } catch (err) {
+    console.error('User deletion error:', err);
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
 // Super Admin Setup Route (only works if no admins exist)
 router.post('/setup-super-admin', async (req, res) => {
   try {

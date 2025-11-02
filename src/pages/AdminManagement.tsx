@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Shield, UserPlus, Users } from "lucide-react";
+import { Loader2, Shield, UserPlus, Users, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const AdminManagement = () => {
@@ -119,6 +119,37 @@ const AdminManagement = () => {
       fetchUsers();
     } catch (error) {
       toast.error('Failed to promote user');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to delete user "${userName}"? This action cannot be undone.`
+    );
+    
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/users/${userId}`, {
+        method: "DELETE",
+        headers: { 
+          "Authorization": `Bearer ${token}`
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || 'Failed to delete user');
+        return;
+      }
+
+      toast.success(`User ${userName} has been deleted successfully`);
+      fetchUsers();
+    } catch (error) {
+      toast.error('Failed to delete user');
     }
   };
 
@@ -262,16 +293,27 @@ const AdminManagement = () => {
                             </Badge>
                           </div>
                         </div>
-                        {user.role !== 'admin' && (
+                        <div className="flex items-center gap-2">
+                          {user.role !== 'admin' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePromoteUser(user.id, user.name)}
+                            >
+                              <Shield className="mr-2 h-4 w-4" />
+                              Promote to Admin
+                            </Button>
+                          )}
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            onClick={() => handlePromoteUser(user.id, user.name)}
+                            onClick={() => handleDeleteUser(user.id, user.name)}
+                            className="ml-2"
                           >
-                            <Shield className="mr-2 h-4 w-4" />
-                            Promote to Admin
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete User
                           </Button>
-                        )}
+                        </div>
                       </div>
                     ))
                   )}
