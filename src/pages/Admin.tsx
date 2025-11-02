@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle, XCircle, Loader2, Shield } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, Loader2, Shield, Trash2 } from "lucide-react";
 import EventCard from "@/components/EventCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -123,6 +123,42 @@ const Admin = () => {
     } catch (error) {
       console.error('Error rejecting event:', error);
       toast.error('Failed to reject event');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteEvent = async (eventId: string, eventTitle: string) => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to delete the event "${eventTitle}"? This action cannot be undone and will remove all associated data.`
+    );
+    
+    if (!confirmed) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      setActionLoading(eventId);
+      console.log('Deleting event with ID:', eventId);
+      const res = await fetch(`/api/events/${eventId}`, {
+        method: 'DELETE',
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Delete failed:', res.status, errorText);
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      toast.success(data.message || 'Event deleted successfully!');
+      await fetchAllEvents(token);
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast.error('Failed to delete event');
     } finally {
       setActionLoading(null);
     }
@@ -256,6 +292,19 @@ const Admin = () => {
                             </>
                           )}
                         </Button>
+                        <Button
+                          onClick={() => handleDeleteEvent(event.id, event.event_name)}
+                          variant="destructive"
+                          size="sm"
+                          className="px-3"
+                          disabled={actionLoading === event.id}
+                        >
+                          {actionLoading === event.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -278,11 +327,26 @@ const Admin = () => {
                 {approvedEvents.map((event) => (
                   <div key={event.id} className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-6">
                     <EventCard event={event} showActions={false} />
-                    <div className="mt-4 flex items-center gap-2">
+                    <div className="mt-4 flex items-center justify-between">
                       <div className="flex items-center gap-1 text-green-600">
                         <CheckCircle className="h-4 w-4" />
                         <span className="text-sm font-medium">Approved</span>
                       </div>
+                      <Button
+                        onClick={() => handleDeleteEvent(event.id, event.event_name)}
+                        variant="destructive"
+                        size="sm"
+                        disabled={actionLoading === event.id}
+                      >
+                        {actionLoading === event.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -304,11 +368,26 @@ const Admin = () => {
                 {rejectedEvents.map((event) => (
                   <div key={event.id} className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-6">
                     <EventCard event={event} showActions={false} />
-                    <div className="mt-4 flex items-center gap-2">
+                    <div className="mt-4 flex items-center justify-between">
                       <div className="flex items-center gap-1 text-red-600">
                         <XCircle className="h-4 w-4" />
                         <span className="text-sm font-medium">Rejected</span>
                       </div>
+                      <Button
+                        onClick={() => handleDeleteEvent(event.id, event.event_name)}
+                        variant="destructive"
+                        size="sm"
+                        disabled={actionLoading === event.id}
+                      >
+                        {actionLoading === event.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </div>
                 ))}

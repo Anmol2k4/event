@@ -52,14 +52,28 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete event by ID
-router.delete('/:id', async (req, res) => {
+// Delete event by ID (admin only)
+router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const event = await Event.findByIdAndDelete(req.params.id);
+    const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ error: 'Event not found' });
-    res.json({ message: 'Event deleted' });
+    
+    // Store event info for response before deletion
+    const deletedEventInfo = {
+      id: event._id,
+      title: event.title,
+      status: event.status,
+      event_date: event.event_date
+    };
+    
+    await Event.findByIdAndDelete(req.params.id);
+    res.json({ 
+      message: `Event "${deletedEventInfo.title}" has been deleted successfully`,
+      deletedEvent: deletedEventInfo
+    });
   } catch (err) {
-    res.status(400).json({ error: 'Invalid event ID' });
+    console.error('Event deletion error:', err);
+    res.status(400).json({ error: 'Failed to delete event' });
   }
 });
 
