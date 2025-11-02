@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Pastel color palette for ReqNet */
+    --background: 280 30% 98%;
+    --foreground: 280 15% 25%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 280 15% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 280 15% 25%;
+
+    /* Primary - Soft Lavender */
+    --primary: 270 60% 70%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 270 60% 85%;
+    --primary-dark: 270 60% 55%;
+
+    /* Secondary - Sky Blue */
+    --secondary: 200 65% 75%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 200 65% 88%;
+
+    /* Accent - Blush Pink */
+    --accent: 340 70% 80%;
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 340 70% 92%;
+
+    /* Success - Mint Green */
+    --success: 150 50% 70%;
+    --success-foreground: 0 0% 100%;
+
+    --muted: 280 20% 94%;
+    --muted-foreground: 280 10% 45%;
+
+    --destructive: 0 70% 65%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 280 20% 88%;
+    --input: 280 20% 88%;
+    --ring: 270 60% 70%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(270 60% 70%), hsl(200 65% 75%));
+    --gradient-hero: linear-gradient(180deg, hsl(270 60% 95%), hsl(200 65% 95%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(280 30% 98%));
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -2px hsl(270 60% 70% / 0.15);
+    --shadow-card: 0 8px 30px -6px hsl(270 60% 70% / 0.2);
+    --shadow-hover: 0 12px 40px -8px hsl(270 60% 70% / 0.3);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 280 20% 12%;
+    --foreground: 280 10% 95%;
+
+    --card: 280 20% 15%;
+    --card-foreground: 280 10% 95%;
+
+    --popover: 280 20% 15%;
+    --popover-foreground: 280 10% 95%;
+
+    --primary: 270 60% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 200 55% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 340 60% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 280 20% 20%;
+    --muted-foreground: 280 10% 65%;
+
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 280 20% 25%;
+    --input: 280 20% 25%;
+    --ring: 270 60% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
